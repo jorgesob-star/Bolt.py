@@ -10,7 +10,7 @@ st.subheader("Insira os valores:")
 
 valor_inicial = st.number_input("💰 Valor inicial", min_value=0.0, value=100.0, step=10.0)
 perc_pat = st.number_input("👔 Percentagem Patrão (%)", min_value=0.0, value=12.0, step=1.0)
-desc_seguro = st.number_input("🛡️ Desconto Seguro", min_value=0.0, value=6.0, step=1.0)
+desc_seguro = st.number_input("🛡️ Aluguer ou Seguro", min_value=0.0, value=6.0, step=1.0)
 desc_combustivel = st.number_input("⛽ Desconto Combustível", min_value=0.0, value=30.0, step=1.0)
 
 st.markdown("---")
