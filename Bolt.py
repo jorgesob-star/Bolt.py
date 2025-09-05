@@ -3,37 +3,23 @@ import streamlit as st
 # Configuração da página
 st.set_page_config(page_title="Calculadora de Descontos (sem Uber)", layout="centered")
 st.title("💸 Calculadora de Descontos (sem Uber)")
-st.markdown("Calcule rapidamente os descontos do Patrão, Seguro e Combustível.")
+st.markdown("Calcule rapidamente os descontos da Empresa, Aluguer, Seguro e Combustível.")
 
-# Entradas
+# Entrada principal
 st.subheader("Insira os valores:")
-
 valor_inicial = st.number_input("💰 Valor inicial", min_value=0.0, value=700.0, step=10.0)
-perc_pat = st.number_input("👔 Percentagem Patrão (%)", min_value=0.0, value=12.0, step=1.0)
-desc_seguro = st.number_input("🛡️ Aluguer ou Seguro", min_value=0.0, value=45.0, step=1.0)
-desc_combustivel = st.number_input("⛽ Desconto Combustível", min_value=0.0, value=200.0, step=1.0)
 
-st.markdown("---")
+# Linha dividida em 2 colunas
+col1, col2 = st.columns(2)
 
-if st.button("Calcular 🔹", use_container_width=True):
-    st.subheader("📊 Resultado detalhado:")
+with col1:
+    # Percentagem Empresa (esquerda)
+    perc_esq = st.number_input("👔 Empresa (%)", min_value=0.0, value=7.0, step=0.5)
+    # Aluguer editável
+    aluguer = st.number_input("🏠 Aluguer (€)", min_value=0.0, value=280.0, step=1.0)
 
-    valor = valor_inicial
-
-    # Patrão
-    desconto_pat = valor * (perc_pat / 100)
-    valor -= desconto_pat
-    st.markdown(f"<div style='background-color:#CCE5FF;padding:10px;border-radius:5px'>"
-                f"- {perc_pat}% Patrão: -{desconto_pat:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
-
-    # Seguro
-    valor -= desc_seguro
-    st.markdown(f"<div style='background-color:#CCFFCC;padding:10px;border-radius:5px'>"
-                f"- Seguro: -{desc_seguro:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
-
-    # Combustível
-    valor -= desc_combustivel
-    st.markdown(f"<div style='background-color:#FFF2CC;padding:10px;border-radius:5px'>"
-                f"- Combustível: -{desc_combustivel:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
-
-    st.success(f"💰 Valor final após descontos: {valor:.2f}")
+with col2:
+    # Percentagem Empresa (direita)
+    perc_dir = st.number_input("👔 Empresa (%)", min_value=0.0, value=12.0, step=0.5)
+    # Seguro editável
+    seguro = st.number_input("🛡️ Seguro (€)", min_value
