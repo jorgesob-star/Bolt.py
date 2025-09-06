@@ -2,7 +2,7 @@ import streamlit as st
 
 # --- Configuração da página ---
 st.set_page_config(page_title="Comparador de Descontos", layout="centered")
-st.title("💸 Comparador de Descontos")
+st.title("💸 Comparador mensal")
 
 # --- Valores padrão ---
 DEFAULTS = {
