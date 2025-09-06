@@ -6,11 +6,11 @@ st.title("💸 Comparador de Descontos")
 
 # --- Valores padrão ---
 DEFAULTS = {
-    'aluguer': 280.0,
+    'aluguer': 1200,0
     'perc_aluguer': 7.0,
-    'seguro': 45.0,
+    'seguro': 180.0,
     'perc_seguro': 12.0,
-    'manutencao': 50.0
+    'manutencao': 200.0
 }
 
 # Inicializa o estado da sessão
