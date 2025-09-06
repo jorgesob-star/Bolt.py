@@ -1,5 +1,4 @@
 import streamlit as st
-import plotly.graph_objects as go
 
 # --- Configuração da página ---
 st.set_page_config(page_title="Comparador de Descontos", layout="centered")
@@ -49,7 +48,20 @@ else:
 
 st.markdown("---")
 
-# --- Cálculo e Dashboard Interativo ---
+# --- Função para barras horizontais ---
+def barra_horizontal(valor, label, cor, max_valor):
+    proporcao = abs(valor) / max_valor if max_valor > 0 else 0
+    st.markdown(f"""
+        <div style="display:flex; align-items:center; margin-bottom:5px;">
+            <div style="width:150px;">{label}</div>
+            <div style="flex:1; background-color:#e0e0e0; border-radius:5px;">
+                <div style="width:{proporcao*100}%; background-color:{cor}; padding:5px 0; border-radius:5px;"></div>
+            </div>
+            <div style="width:80px; text-align:right;">{valor:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+# --- Cálculo e Visualização ---
 if st.button("Calcular 🔹", type="primary"):
     # Preparar dados
     apuro_liquido = apuro - desc_combustivel
@@ -67,7 +79,7 @@ if st.button("Calcular 🔹", type="primary"):
     st.metric("Horas Trabalhadas", f"{horas_trabalho:,.0f} h")
     st.markdown("---")
 
-    # Determinar a melhor opção com base na sobra
+    # Melhor opção
     if sobra_opcao1 > sobra_opcao2:
         melhor_idx = 0
     elif sobra_opcao2 > sobra_opcao1:
@@ -75,53 +87,23 @@ if st.button("Calcular 🔹", type="primary"):
     else:
         melhor_idx = -1  # empate
 
-    # Abas
+    # --- Abas ---
     tab1, tab2 = st.tabs(["📈 Dashboard", "🧮 Detalhes dos Cálculos"])
     with tab1:
-        st.write("### Comparação Financeira com Destaque de Melhor Opção")
+        st.write("### Comparação Visual com Destaque")
 
-        categorias = ["Opção 1 (Alugado)", "Opção 2 (Próprio)"]
+        max_sobra = max(abs(sobra_opcao1), abs(sobra_opcao2), 1)
+        max_ganho = max(abs(ganho_hora_opcao1), abs(ganho_hora_opcao2), 1)
 
-        # Cores condicionais
-        cores_sobra = ['#4caf50' if melhor_idx == 0 else '#a5d6a7', '#2196f3' if melhor_idx == 1 else '#90caf9']
-        cores_ganho = ['#4caf50' if melhor_idx == 0 else '#a5d6a7', '#2196f3' if melhor_idx == 1 else '#90caf9']
+        # Sobra (€)
+        st.write("**Sobra (€)**")
+        barra_horizontal(sobra_opcao1, f"Opção 1 {'🏆' if melhor_idx==0 else ''}", '#4caf50' if melhor_idx==0 else '#a5d6a7', max_sobra)
+        barra_horizontal(sobra_opcao2, f"Opção 2 {'🏆' if melhor_idx==1 else ''}", '#2196f3' if melhor_idx==1 else '#90caf9', max_sobra)
 
-        fig = go.Figure()
-
-        # Barra da Sobra (€)
-        fig.add_trace(go.Bar(
-            y=categorias,
-            x=[sobra_opcao1, sobra_opcao2],
-            name='Sobra (€)',
-            orientation='h',
-            marker_color=cores_sobra,
-            text=[f"{'🏆 ' if melhor_idx==0 else ''}{sobra_opcao1:,.2f} €",
-                  f"{'🏆 ' if melhor_idx==1 else ''}{sobra_opcao2:,.2f} €"],
-            textposition='auto'
-        ))
-
-        # Barra do Ganho/Hora (€)
-        fig.add_trace(go.Bar(
-            y=categorias,
-            x=[ganho_hora_opcao1, ganho_hora_opcao2],
-            name='Ganho/Hora (€/h)',
-            orientation='h',
-            marker_color=cores_ganho,
-            text=[f"{'🏆 ' if melhor_idx==0 else ''}{ganho_hora_opcao1:,.2f} €/h",
-                  f"{'🏆 ' if melhor_idx==1 else ''}{ganho_hora_opcao2:,.2f} €/h"],
-            textposition='auto'
-        ))
-
-        fig.update_layout(
-            barmode='group',
-            title="💰 Comparativo Financeiro",
-            xaxis_title="Valor",
-            yaxis_title="Opções",
-            legend_title="Indicadores",
-            height=450
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
+        # Ganho/Hora
+        st.write("**Ganho por Hora (€/h)**")
+        barra_horizontal(ganho_hora_opcao1, f"Opção 1 {'🏆' if melhor_idx==0 else ''}", '#4caf50' if melhor_idx==0 else '#a5d6a7', max_ganho)
+        barra_horizontal(ganho_hora_opcao2, f"Opção 2 {'🏆' if melhor_idx==1 else ''}", '#2196f3' if melhor_idx==1 else '#90caf9', max_ganho)
 
         # Mensagem complementar
         if melhor_idx == 0:
