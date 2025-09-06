@@ -22,9 +22,9 @@ for key, value in DEFAULTS.items():
 
 # --- Entradas ---
 st.header("Entradas do Usuário")
-apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=700.0, step=10.0)
+apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=3000.0, step=10.0)
 desc_combustivel = st.number_input("⛽ Desconto de Combustível (€)", min_value=0.0, value=200.0, step=1.0)
-horas_trabalho = st.number_input("⏱️ Número de horas trabalhadas", min_value=1.0, value=40.0, step=1.0)
+horas_trabalho = st.number_input("⏱️ Número de horas trabalhadas", min_value=1.0, value=240.0, step=1.0)
 st.markdown("---")
 
 # --- Opções ---
