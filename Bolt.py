@@ -15,7 +15,7 @@ st.markdown("Calcule seus rendimentos líquidos como motorista TVDE")
 if 'comissao_plataforma' not in st.session_state:
     st.session_state.comissao_plataforma = 6.0
 if 'aluguer_viatura' not in st.session_state:
-    st.session_state.aluguer_viatura = 30.0
+    st.session_state.aluguer_viatura = 39.0
 if 'show_advanced' not in st.session_state:
     st.session_state.show_advanced = False
 
