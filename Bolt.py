@@ -54,7 +54,7 @@ combustivel_semanal = 150.0
 col1, col2 = st.columns(2)
 
 with col1:
-    dias_trabalhados = st.slider("Dias trabalhados na semana", 1, 7, 5)
+    dias_trabalhados = st.slider("Dias trabalhados na semana", 1, 7, 7)
     ganhos_brutos_semana = st.number_input(
         "Ganhos Brutos Semanais (€)", 
         min_value=0.0, 
