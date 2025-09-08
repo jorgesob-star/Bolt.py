@@ -1,5 +1,4 @@
 import streamlit as st
-import math
 
 # Configuração da página
 st.set_page_config(
@@ -15,6 +14,8 @@ st.markdown("Calcule seus rendimentos líquidos semanais como motorista TVDE")
 # Inicializar variáveis de sessão
 if 'comissao_plataforma' not in st.session_state:
     st.session_state.comissao_plataforma = 6.0
+if 'aluguer_semanal' not in st.session_state:
+    st.session_state.aluguer_semanal = 270.0
 if 'show_advanced' not in st.session_state:
     st.session_state.show_advanced = False
 
@@ -37,13 +38,17 @@ if st.session_state.show_advanced:
             value=st.session_state.comissao_plataforma, step=0.5,
             key="comissao_input"
         )
+        st.session_state.aluguer_semanal = st.number_input(
+            "Aluguer Semanal da Viatura (€)", 
+            min_value=0.0, value=st.session_state.aluguer_semanal, step=10.0,
+            key="aluguer_input"
+        )
 
 # Entradas principais do usuário
 st.header("Entradas Semanais")
 
 # Valores iniciais conforme solicitado
 apuro_semanal = 700.0
-aluguer_semanal = 270.0
 combustivel_semanal = 150.0
 
 col1, col2 = st.columns(2)
@@ -65,12 +70,6 @@ with col2:
         value=combustivel_semanal, 
         step=10.0
     )
-    aluguer_semana = st.number_input(
-        "Aluguer Semanal da Viatura (€)", 
-        min_value=0.0, 
-        value=aluguer_semanal, 
-        step=10.0
-    )
     outros_custos = st.number_input(
         "Outros Custos Semanais (€)", 
         min_value=0.0, 
@@ -83,7 +82,7 @@ with col2:
 comissao_valor_semana = ganhos_brutos_semana * (st.session_state.comissao_plataforma / 100)
 
 ganhos_liquidos_semana = (ganhos_brutos_semana - comissao_valor_semana - 
-                         custo_gasolina_semana - aluguer_semana - outros_custos)
+                         custo_gasolina_semana - st.session_state.aluguer_semanal - outros_custos)
 
 margem_lucro = (ganhos_liquidos_semana / ganhos_brutos_semana) * 100 if ganhos_brutos_semana > 0 else 0
 
@@ -104,7 +103,7 @@ valores = [
     max(ganhos_liquidos_semana, 0), 
     comissao_valor_semana, 
     custo_gasolina_semana, 
-    aluguer_semana, 
+    st.session_state.aluguer_semanal, 
     outros_custos
 ]
 
@@ -127,13 +126,13 @@ with det_col1:
     st.write("**Custos:**")
     st.write(f"- Comissão Plataforma: €{comissao_valor_semana:.2f}")
     st.write(f"- Gasolina: €{custo_gasolina_semana:.2f}")
-    st.write(f"- Aluguer Viatura: €{aluguer_semana:.2f}")
+    st.write(f"- Aluguer Viatura: €{st.session_state.aluguer_semanal:.2f}")
     st.write(f"- Outros Custos: €{outros_custos:.2f}")
 
 with det_col2:
     st.write("**Totais:**")
     st.write(f"- Total Ganhos: €{ganhos_brutos_semana:.2f}")
-    total_custos = comissao_valor_semana + custo_gasolina_semana + aluguer_semana + outros_custos
+    total_custos = comissao_valor_semana + custo_gasolina_semana + st.session_state.aluguer_semanal + outros_custos
     st.write(f"- Total Custos: €{total_custos:.2f}")
     st.write(f"- **Lucro Líquido: €{ganhos_liquidos_semana:.2f}**")
     st.write(f"- Margem de Lucro: {margem_lucro:.1f}%")
@@ -165,6 +164,10 @@ resumo_col2.metric("Custos Semanais", f"€{total_custos:.2f}")
 resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", 
                   delta=f"{margem_lucro:.1f}%")
 
+# Mostrar valores ocultos apenas em modo avançado
+if st.session_state.show_advanced:
+    st.info(f"ℹ️ **Valores atuais das configurações avançadas:** Comissão: {st.session_state.comissao_plataforma}%, Aluguer: €{st.session_state.aluguer_semanal:.2f}")
+
 # Rodapé
 st.markdown("---")
-st.caption("App desenvolvido para cálculo de ganhos no TVDE. Considere outros custos não incluídos aqui como manutenção, seguros, etc.")
+st.caption("App desenvolvido para cálculo de ganhos no TVDE. Use o botão 'Configurações Avançadas' para ajustar a comissão e aluguer.")
