@@ -26,10 +26,10 @@ if 'params' not in st.session_state:
         'extra_expenses': 0.0,
         'include_extra_expenses': False,
         'calculation_type': None,
-        'weekly_earnings': 999.0,
-        'weekly_hours': 56.0,
-        'fuel_cost': 170.0,
-        'weekly_km': 1500.0
+        'weekly_earnings': 1000.0,
+        'weekly_hours': 60.0,
+        'fuel_cost': 230.0,
+        'weekly_km': 2000.0
     }
 
 # --- Função para formatar moeda ---
