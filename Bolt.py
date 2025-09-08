@@ -48,8 +48,8 @@ if st.session_state.show_advanced:
 st.header("Entradas Semanais")
 
 # Valores iniciais conforme solicitado
-apuro_semanal = 700.0
-combustivel_semanal = 150.0
+apuro_semanal = 1000.0
+combustivel_semanal = 250.0
 
 col1, col2 = st.columns(2)
 
