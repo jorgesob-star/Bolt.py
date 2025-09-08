@@ -1,6 +1,5 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import numpy as np
+import math
 
 # Configuração da página
 st.set_page_config(
@@ -96,11 +95,11 @@ col1.metric("Ganhos Líquidos Semanais", f"€{ganhos_liquidos_semana:.2f}")
 col2.metric("Comissão Plataforma", f"€{comissao_valor_semana:.2f}")
 col3.metric("Margem de Lucro", f"{margem_lucro:.1f}%")
 
-# Visualização gráfica
+# Visualização simplificada
 st.subheader("Distribuição dos Custos e Ganhos")
 
-# Preparar dados para o gráfico
-categorias = ['Ganhos Líquidos', 'Comissão Plataforma', 'Gasolina', 'Aluguer Viatura', 'Outros Custos']
+# Criar visualização usando barras nativas do Streamlit
+categorias = ['Ganhos Líquidos', 'Comissão', 'Gasolina', 'Aluguer', 'Outros']
 valores = [
     max(ganhos_liquidos_semana, 0), 
     comissao_valor_semana, 
@@ -108,37 +107,45 @@ valores = [
     aluguer_semana, 
     outros_custos
 ]
-cores = ['#2ecc71', '#e74c3c', '#f39c12', '#3498db', '#9b59b6']
 
-# Criar gráfico
-fig, ax = plt.subplots(figsize=(10, 6))
-bars = ax.bar(categorias, valores, color=cores)
-ax.set_ylabel('Valores (€)')
-ax.set_title('Distribuição Semanal de Custos e Ganhos')
+data = {
+    "Categoria": categorias,
+    "Valor (€)": valores,
+    "Tipo": ["Ganho", "Custo", "Custo", "Custo", "Custo"]
+}
 
-# Adicionar valores nas barras
-for bar, valor in zip(bars, valores):
-    height = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2., height + 5,
-            f'€{valor:.2f}', ha='center', va='bottom')
+st.bar_chart(data, x="Categoria", y="Valor (€)", color="Tipo")
 
-plt.xticks(rotation=45)
-st.pyplot(fig)
+# Tabela de detalhamento
+st.subheader("📊 Detalhamento dos Custos")
+det_col1, det_col2 = st.columns(2)
 
-# Detalhamento dos cálculos
-with st.expander("📊 Ver detalhamento dos cálculos"):
-    st.subheader("Detalhamento Semanal")
-    st.write(f"**Ganhos brutos semanais (apuro):** €{ganhos_brutos_semana:.2f}")
-    st.write(f"**Comissão da plataforma ({st.session_state.comissao_plataforma}%):** €{comissao_valor_semana:.2f}")
-    st.write(f"**Custo com gasolina semanal:** €{custo_gasolina_semana:.2f}")
-    st.write(f"**Aluguer da viatura semanal:** €{aluguer_semana:.2f}")
-    st.write(f"**Outros custos:** €{outros_custos:.2f}")
-    st.write(f"**Ganhos líquidos semanais:** €{ganhos_brutos_semana:.2f} - €{comissao_valor_semana:.2f} - €{custo_gasolina_semana:.2f} - €{aluguer_semana:.2f} - €{outros_custos:.2f} = €{ganhos_liquidos_semana:.2f}")
-    
-    # Cálculo diário
-    st.subheader("Médias Diárias")
-    st.write(f"**Ganhos brutos diários:** €{ganhos_brutos_semana/dias_trabalhados:.2f}")
-    st.write(f"**Ganhos líquidos diários:** €{ganhos_liquidos_semana/dias_trabalhados:.2f}")
+with det_col1:
+    st.write("**Ganhos:**")
+    st.write(f"- Apuro Bruto: €{ganhos_brutos_semana:.2f}")
+    st.write("")
+    st.write("**Custos:**")
+    st.write(f"- Comissão Plataforma: €{comissao_valor_semana:.2f}")
+    st.write(f"- Gasolina: €{custo_gasolina_semana:.2f}")
+    st.write(f"- Aluguer Viatura: €{aluguer_semana:.2f}")
+    st.write(f"- Outros Custos: €{outros_custos:.2f}")
+
+with det_col2:
+    st.write("**Totais:**")
+    st.write(f"- Total Ganhos: €{ganhos_brutos_semana:.2f}")
+    total_custos = comissao_valor_semana + custo_gasolina_semana + aluguer_semana + outros_custos
+    st.write(f"- Total Custos: €{total_custos:.2f}")
+    st.write(f"- **Lucro Líquido: €{ganhos_liquidos_semana:.2f}**")
+    st.write(f"- Margem de Lucro: {margem_lucro:.1f}%")
+
+# Cálculo diário
+st.subheader("💰 Médias Diárias")
+ganho_bruto_diario = ganhos_brutos_semana / dias_trabalhados
+ganho_liquido_diario = ganhos_liquidos_semana / dias_trabalhados
+
+col1, col2 = st.columns(2)
+col1.metric("Ganho Bruto Diário", f"€{ganho_bruto_diario:.2f}")
+col2.metric("Ganho Líquido Diário", f"€{ganho_liquido_diario:.2f}")
 
 # Projeção mensal
 st.header("📈 Projeção Mensal")
@@ -146,15 +153,15 @@ dias_uteis_mes = st.slider("Dias úteis no mês", 20, 31, 22)
 semanas_mes = dias_uteis_mes / dias_trabalhados
 ganhos_mensais = ganhos_liquidos_semana * semanas_mes
 
-col1, col2 = st.columns(2)
-col1.metric("Projeção de Ganhos Mensais", f"€{ganhos_mensais:.2f}")
-col2.metric("Média Diária Líquida", f"€{ganhos_liquidos_semana/dias_trabalhados:.2f}")
+proj_col1, proj_col2 = st.columns(2)
+proj_col1.metric("Projeção de Ganhos Mensais", f"€{ganhos_mensais:.2f}")
+proj_col2.metric("Média Diária Líquida", f"€{ganho_liquido_diario:.2f}")
 
 # Resumo final
-st.header("💶 Resumo Financeiro")
+st.header("💶 Resumo Financeiro Semanal")
 resumo_col1, resumo_col2, resumo_col3 = st.columns(3)
 resumo_col1.metric("Apuro Semanal", f"€{ganhos_brutos_semana:.2f}")
-resumo_col2.metric("Custos Semanais", f"€{(comissao_valor_semana + custo_gasolina_semana + aluguer_semana + outros_custos):.2f}")
+resumo_col2.metric("Custos Semanais", f"€{total_custos:.2f}")
 resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", 
                   delta=f"{margem_lucro:.1f}%")
 
