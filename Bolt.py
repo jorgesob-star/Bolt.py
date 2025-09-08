@@ -1,5 +1,4 @@
 import streamlit as st
-import math
 
 # Configuração da página
 st.set_page_config(
@@ -17,12 +16,14 @@ st.header("Entradas")
 col1, col2 = st.columns(2)
 
 with col1:
-    ganhos_brutos = st.number_input("Ganhos Brutos (€)", min_value=0.0, value=700.0, step=10.0)
-    comissao_plataforma = st.number_input("Comissão da Plataforma (%)", min_value=0.0, max_value=100.0, value=6.0, step=0.5)
+    ganhos_brutos = st.number_input("Ganhos Brutos (€)", min_value=0.0, value=100.0, step=10.0)
 
 with col2:
-    custo_gasolina = st.number_input("Custo com Gasolina (€)", min_value=0.0, value=150.0, step=5.0)
-    aluguer_viatura = st.number_input("Aluguer da Viatura (€)", min_value=0.0, value=270.0, step=5.0)
+    custo_gasolina = st.number_input("Custo com Gasolina (€)", min_value=0.0, value=20.0, step=5.0)
+
+# Valores fixos (escondidos do usuário)
+comissao_plataforma = 6.0  # 6% fixo
+aluguer_viatura = 30.0     # €30 fixo
 
 # Cálculos
 comissao_valor = ganhos_brutos * (comissao_plataforma / 100)
@@ -55,6 +56,9 @@ with st.expander("Ver detalhamento dos cálculos"):
     st.write(f"**Custo com gasolina:** €{custo_gasolina:.2f}")
     st.write(f"**Aluguer da viatura:** €{aluguer_viatura:.2f}")
     st.write(f"**Ganhos líquidos:** €{ganhos_brutos:.2f} - €{comissao_valor:.2f} - €{custo_gasolina:.2f} - €{aluguer_viatura:.2f} = €{ganhos_liquidos:.2f}")
+    
+    # Mostrar valores fixos usados
+    st.info(f"ℹ️ Valores fixos utilizados: Comissão da plataforma = {comissao_plataforma}%, Aluguer da viatura = €{aluguer_viatura:.2f}")
 
 # Adicionar seção para múltiplos dias
 st.header("📅 Cálculo para Múltiplos Dias")
