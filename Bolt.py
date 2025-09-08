@@ -1,6 +1,5 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
+import math
 
 # Configuração da página
 st.set_page_config(
@@ -38,20 +37,16 @@ col1.metric("Ganhos Líquidos", f"€{ganhos_liquidos:.2f}")
 col2.metric("Comissão Plataforma", f"€{comissao_valor:.2f}")
 col3.metric("Margem de Lucro", f"{margem_lucro:.1f}%")
 
-# Visualização gráfica
-st.subheader("Distribuição dos Custos e Ganhos")
+# Visualização simplificada
+st.subheader("Distribuição dos Valores")
 
-dados = {
-    'Categoria': ['Ganhos Líquidos', 'Comissão Plataforma', 'Gasolina', 'Aluguer Viatura'],
-    'Valor (€)': [ganhos_liquidos, comissao_valor, custo_gasolina, aluguer_viatura],
-    'Tipo': ['Ganho', 'Custo', 'Custo', 'Custo']
-}
+# Criar gráfico de barras simples
+valores = [ganhos_liquidos, comissao_valor, custo_gasolina, aluguer_viatura]
+categorias = ['Ganhos Líquidos', 'Comissão Plataforma', 'Gasolina', 'Aluguer Viatura']
+cores = ['green', 'red', 'orange', 'blue']
 
-df = pd.DataFrame(dados)
-fig = px.pie(df, values='Valor (€)', names='Categoria', 
-             title='Distribuição dos Valores',
-             color='Tipo', color_discrete_map={'Ganho':'green', 'Custo':'red'})
-st.plotly_chart(fig)
+data = {"Categorias": categorias, "Valores (€)": valores, "Cores": cores}
+st.bar_chart(data, x="Categorias", y="Valores (€)", color="Cores")
 
 # Detalhamento dos cálculos
 with st.expander("Ver detalhamento dos cálculos"):
@@ -60,6 +55,13 @@ with st.expander("Ver detalhamento dos cálculos"):
     st.write(f"**Custo com gasolina:** €{custo_gasolina:.2f}")
     st.write(f"**Aluguer da viatura:** €{aluguer_viatura:.2f}")
     st.write(f"**Ganhos líquidos:** €{ganhos_brutos:.2f} - €{comissao_valor:.2f} - €{custo_gasolina:.2f} - €{aluguer_viatura:.2f} = €{ganhos_liquidos:.2f}")
+
+# Adicionar seção para múltiplos dias
+st.header("📅 Cálculo para Múltiplos Dias")
+dias_trabalhados = st.slider("Número de dias trabalhados", 1, 30, 1)
+ganhos_totais = ganhos_liquidos * dias_trabalhados
+
+st.metric(f"Ganhos líquidos para {dias_trabalhados} dias", f"€{ganhos_totais:.2f}")
 
 # Rodapé
 st.markdown("---")
