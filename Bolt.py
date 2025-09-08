@@ -11,7 +11,40 @@ st.set_page_config(
 st.title("🚗 Calculadora de Ganhos TVDE")
 st.markdown("Calcule seus rendimentos líquidos como motorista TVDE")
 
-# Entradas do usuário
+# Inicializar variáveis de sessão para manter os valores
+if 'comissao_plataforma' not in st.session_state:
+    st.session_state.comissao_plataforma = 6.0
+if 'aluguer_viatura' not in st.session_state:
+    st.session_state.aluguer_viatura = 30.0
+if 'show_advanced' not in st.session_state:
+    st.session_state.show_advanced = False
+
+# Função para alternar a visualização das configurações avançadas
+def toggle_advanced():
+    st.session_state.show_advanced = not st.session_state.show_advanced
+
+# Botão para mostrar/ocultar configurações avançadas
+st.button(
+    "⚙️ Configurações Avançadas" if not st.session_state.show_advanced else "⬆️ Ocultar Configurações",
+    on_click=toggle_advanced
+)
+
+# Mostrar configurações avançadas se o botão foi clicado
+if st.session_state.show_advanced:
+    with st.expander("Configurações Avançadas", expanded=True):
+        st.session_state.comissao_plataforma = st.number_input(
+            "Comissão da Plataforma (%)", 
+            min_value=0.0, max_value=100.0, 
+            value=st.session_state.comissao_plataforma, step=0.5,
+            key="comissao_input"
+        )
+        st.session_state.aluguer_viatura = st.number_input(
+            "Aluguer da Viatura (€)", 
+            min_value=0.0, value=st.session_state.aluguer_viatura, step=5.0,
+            key="aluguer_input"
+        )
+
+# Entradas principais do usuário
 st.header("Entradas")
 col1, col2 = st.columns(2)
 
@@ -21,13 +54,9 @@ with col1:
 with col2:
     custo_gasolina = st.number_input("Custo com Gasolina (€)", min_value=0.0, value=20.0, step=5.0)
 
-# Valores fixos (escondidos do usuário)
-comissao_plataforma = 6.0  # 6% fixo
-aluguer_viatura = 30.0     # €30 fixo
-
 # Cálculos
-comissao_valor = ganhos_brutos * (comissao_plataforma / 100)
-ganhos_liquidos = ganhos_brutos - comissao_valor - custo_gasolina - aluguer_viatura
+comissao_valor = ganhos_brutos * (st.session_state.comissao_plataforma / 100)
+ganhos_liquidos = ganhos_brutos - comissao_valor - custo_gasolina - st.session_state.aluguer_viatura
 margem_lucro = (ganhos_liquidos / ganhos_brutos) * 100 if ganhos_brutos > 0 else 0
 
 # Exibir resultados
@@ -35,30 +64,26 @@ st.header("Resultados")
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Ganhos Líquidos", f"€{ganhos_liquidos:.2f}")
-col2.metric("Comissão Plataforma", f"€{comissao_valor:.2f}")
+col2.metric("Comissão Plataforma", f"€{comissao_valor:.2f} ({st.session_state.comissao_plataforma}%)")
 col3.metric("Margem de Lucro", f"{margem_lucro:.1f}%")
 
 # Visualização simplificada
 st.subheader("Distribuição dos Valores")
 
 # Criar gráfico de barras simples
-valores = [ganhos_liquidos, comissao_valor, custo_gasolina, aluguer_viatura]
+valores = [ganhos_liquidos, comissao_valor, custo_gasolina, st.session_state.aluguer_viatura]
 categorias = ['Ganhos Líquidos', 'Comissão Plataforma', 'Gasolina', 'Aluguer Viatura']
-cores = ['green', 'red', 'orange', 'blue']
 
-data = {"Categorias": categorias, "Valores (€)": valores, "Cores": cores}
-st.bar_chart(data, x="Categorias", y="Valores (€)", color="Cores")
+data = {"Categorias": categorias, "Valores (€)": valores}
+st.bar_chart(data, x="Categorias", y="Valores (€)")
 
 # Detalhamento dos cálculos
 with st.expander("Ver detalhamento dos cálculos"):
     st.write(f"**Ganhos brutos:** €{ganhos_brutos:.2f}")
-    st.write(f"**Comissão da plataforma ({comissao_plataforma}%):** €{comissao_valor:.2f}")
+    st.write(f"**Comissão da plataforma ({st.session_state.comissao_plataforma}%):** €{comissao_valor:.2f}")
     st.write(f"**Custo com gasolina:** €{custo_gasolina:.2f}")
-    st.write(f"**Aluguer da viatura:** €{aluguer_viatura:.2f}")
-    st.write(f"**Ganhos líquidos:** €{ganhos_brutos:.2f} - €{comissao_valor:.2f} - €{custo_gasolina:.2f} - €{aluguer_viatura:.2f} = €{ganhos_liquidos:.2f}")
-    
-    # Mostrar valores fixos usados
-    st.info(f"ℹ️ Valores fixos utilizados: Comissão da plataforma = {comissao_plataforma}%, Aluguer da viatura = €{aluguer_viatura:.2f}")
+    st.write(f"**Aluguer da viatura:** €{st.session_state.aluguer_viatura:.2f}")
+    st.write(f"**Ganhos líquidos:** €{ganhos_brutos:.2f} - €{comissao_valor:.2f} - €{custo_gasolina:.2f} - €{st.session_state.aluguer_viatura:.2f} = €{ganhos_liquidos:.2f}")
 
 # Adicionar seção para múltiplos dias
 st.header("📅 Cálculo para Múltiplos Dias")
