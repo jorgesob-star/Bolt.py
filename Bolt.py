@@ -17,7 +17,7 @@ st.header("Entradas")
 col1, col2 = st.columns(2)
 
 with col1:
-    ganhos_brutos = st.number_input("Ganhos Brutos (€)", min_value=0.0, value=100.0, step=10.0)
+    ganhos_brutos = st.number_input("Ganhos Brutos (€)", min_value=0.0, value=700.0, step=10.0)
     comissao_plataforma = st.number_input("Comissão da Plataforma (%)", min_value=0.0, max_value=100.0, value=6.0, step=0.5)
 
 with col2:
