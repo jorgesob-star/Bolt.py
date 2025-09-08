@@ -21,8 +21,8 @@ with col1:
     comissao_plataforma = st.number_input("Comissão da Plataforma (%)", min_value=0.0, max_value=100.0, value=6.0, step=0.5)
 
 with col2:
-    custo_gasolina = st.number_input("Custo com Gasolina (€)", min_value=0.0, value=20.0, step=5.0)
-    aluguer_viatura = st.number_input("Aluguer da Viatura (€)", min_value=0.0, value=30.0, step=5.0)
+    custo_gasolina = st.number_input("Custo com Gasolina (€)", min_value=0.0, value=150.0, step=5.0)
+    aluguer_viatura = st.number_input("Aluguer da Viatura (€)", min_value=0.0, value=270.0, step=5.0)
 
 # Cálculos
 comissao_valor = ganhos_brutos * (comissao_plataforma / 100)
