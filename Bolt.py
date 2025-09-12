@@ -48,8 +48,8 @@ if st.session_state.show_advanced:
 st.header("Entradas Semanais")
 
 # Valores iniciais conforme solicitado
-apuro_semanal = 0.0
-combustivel_semanal = 0.0
+apuro_semanal = 900.0
+combustivel_semanal = 210.0
 
 col1, col2 = st.columns(2)
 
@@ -61,6 +61,14 @@ with col1:
         value=apuro_semanal, 
         step=10.0,
         help="Total de ganhos brutos na semana (apuro)"
+    )
+    # Campo para horas trabalhadas
+    horas_trabalhadas_semana = st.number_input(
+        "Total de horas trabalhadas na semana", 
+        min_value=0.0, 
+        value=50.0, 
+        step=0.5,
+        help="Número total de horas que trabalhou durante a semana"
     )
 
 with col2:
@@ -86,6 +94,9 @@ ganhos_liquidos_semana = (ganhos_brutos_semana - comissao_valor_semana -
 
 margem_lucro = (ganhos_liquidos_semana / ganhos_brutos_semana) * 100 if ganhos_brutos_semana > 0 else 0
 
+# Cálculo do valor por hora
+valor_por_hora = ganhos_liquidos_semana / horas_trabalhadas_semana if horas_trabalhadas_semana > 0 else 0
+
 # Exibir resultados
 st.header("Resultados Semanais")
 
@@ -93,6 +104,10 @@ col1, col2, col3 = st.columns(3)
 col1.metric("Ganhos Líquidos Semanais", f"€{ganhos_liquidos_semana:.2f}")
 col2.metric("Comissão Plataforma", f"€{comissao_valor_semana:.2f}")
 col3.metric("Margem de Lucro", f"{margem_lucro:.1f}%")
+
+# Exibir resultado em €/h
+st.subheader("💰 Valor por Hora")
+st.metric("Ganho Líquido por Hora", f"€{valor_por_hora:.2f}")
 
 # Visualização simplificada
 st.subheader("Distribuição dos Custos e Ganhos")
@@ -136,15 +151,18 @@ with det_col2:
     st.write(f"- Total Custos: €{total_custos:.2f}")
     st.write(f"- **Lucro Líquido: €{ganhos_liquidos_semana:.2f}**")
     st.write(f"- Margem de Lucro: {margem_lucro:.1f}%")
+    st.write(f"- **Valor por Hora: €{valor_por_hora:.2f}**")
 
 # Cálculo diário
 st.subheader("💰 Médias Diárias")
 ganho_bruto_diario = ganhos_brutos_semana / dias_trabalhados
 ganho_liquido_diario = ganhos_liquidos_semana / dias_trabalhados
+horas_diarias = horas_trabalhadas_semana / dias_trabalhados
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 col1.metric("Ganho Bruto Diário", f"€{ganho_bruto_diario:.2f}")
 col2.metric("Ganho Líquido Diário", f"€{ganho_liquido_diario:.2f}")
+col3.metric("Média Horas por Dia", f"{horas_diarias:.1f}h")
 
 # Projeção mensal
 st.header("📈 Projeção Mensal")
@@ -152,9 +170,10 @@ dias_uteis_mes = st.slider("Dias úteis no mês", 20, 31, 22)
 semanas_mes = dias_uteis_mes / dias_trabalhados
 ganhos_mensais = ganhos_liquidos_semana * semanas_mes
 
-proj_col1, proj_col2 = st.columns(2)
+proj_col1, proj_col2, proj_col3 = st.columns(3)
 proj_col1.metric("Projeção de Ganhos Mensais", f"€{ganhos_mensais:.2f}")
 proj_col2.metric("Média Diária Líquida", f"€{ganho_liquido_diario:.2f}")
+proj_col3.metric("Valor por Hora", f"€{valor_por_hora:.2f}")
 
 # Resumo final
 st.header("💶 Resumo Financeiro Semanal")
@@ -163,6 +182,13 @@ resumo_col1.metric("Apuro Semanal", f"€{ganhos_brutos_semana:.2f}")
 resumo_col2.metric("Custos Semanais", f"€{total_custos:.2f}")
 resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", 
                   delta=f"{margem_lucro:.1f}%")
+
+# Resumo de horas
+st.subheader("⏰ Resumo de Horas")
+horas_col1, horas_col2, horas_col3 = st.columns(3)
+horas_col1.metric("Total Horas Trabalhadas", f"{horas_trabalhadas_semana:.1f}h")
+horas_col2.metric("Média Horas por Dia", f"{horas_diarias:.1f}h")
+horas_col3.metric("Valor por Hora", f"€{valor_por_hora:.2f}")
 
 # Mostrar valores ocultos apenas em modo avançado
 if st.session_state.show_advanced:
