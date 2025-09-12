@@ -62,7 +62,7 @@ if st.session_state.show_advanced:
 # Entradas principais do usuário
 st.header("Entradas Semanais")
 
-apuro_semanal = 800.0
+apuro_semanal = 900.0
 combustivel_semanal = 200.0
 
 col1, col2 = st.columns(2)
