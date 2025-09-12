@@ -15,11 +15,11 @@ st.markdown("Calcule seus rendimentos líquidos semanais como motorista TVDE")
 if 'comissao_plataforma' not in st.session_state:
     st.session_state.comissao_plataforma = 6.0
 if 'aluguer' not in st.session_state:
-    st.session_state.aluguer = 150.0
+    st.session_state.aluguer = 270.0
 if 'seguro' not in st.session_state:
-    st.session_state.seguro = 80.0
+    st.session_state.seguro = 0.0
 if 'slot' not in st.session_state:
-    st.session_state.slot = 40.0
+    st.session_state.slot = 0.0
 if 'despesas_fixas' not in st.session_state:
     st.session_state.despesas_fixas = st.session_state.aluguer + st.session_state.seguro + st.session_state.slot
 if 'show_advanced' not in st.session_state:
@@ -62,8 +62,8 @@ if st.session_state.show_advanced:
 # Entradas principais do usuário
 st.header("Entradas Semanais")
 
-apuro_semanal = 900.0
-combustivel_semanal = 210.0
+apuro_semanal = 800.0
+combustivel_semanal = 200.0
 
 col1, col2 = st.columns(2)
 
