@@ -14,8 +14,8 @@ st.markdown("Calcule seus rendimentos líquidos semanais como motorista TVDE")
 # Inicializar variáveis de sessão
 if 'comissao_plataforma' not in st.session_state:
     st.session_state.comissao_plataforma = 6.0
-if 'aluguer_semanal' not in st.session_state:
-    st.session_state.aluguer_semanal = 270.0
+if 'despesas_fixas' not in st.session_state:
+    st.session_state.despesas_fixas = 270.0
 if 'show_advanced' not in st.session_state:
     st.session_state.show_advanced = False
 
@@ -38,16 +38,16 @@ if st.session_state.show_advanced:
             value=st.session_state.comissao_plataforma, step=0.5,
             key="comissao_input"
         )
-        st.session_state.aluguer_semanal = st.number_input(
-            "Aluguer Semanal da Viatura (€)", 
-            min_value=0.0, value=st.session_state.aluguer_semanal, step=10.0,
-            key="aluguer_input"
+        st.session_state.despesas_fixas = st.number_input(
+            "Despesas Fixas Semanais (€) (aluguer, seguro, slot, etc.)", 
+            min_value=0.0, value=st.session_state.despesas_fixas, step=10.0,
+            key="despesas_fixas_input"
         )
 
 # Entradas principais do usuário
 st.header("Entradas Semanais")
 
-# Valores iniciais conforme solicitado
+# Valores iniciais
 apuro_semanal = 900.0
 combustivel_semanal = 210.0
 
@@ -62,7 +62,6 @@ with col1:
         step=10.0,
         help="Total de ganhos brutos na semana (apuro)"
     )
-    # Campo para horas trabalhadas
     horas_trabalhadas_semana = st.number_input(
         "Total de horas trabalhadas na semana", 
         min_value=0.0, 
@@ -90,35 +89,29 @@ with col2:
 comissao_valor_semana = ganhos_brutos_semana * (st.session_state.comissao_plataforma / 100)
 
 ganhos_liquidos_semana = (ganhos_brutos_semana - comissao_valor_semana - 
-                         custo_gasolina_semana - st.session_state.aluguer_semanal - outros_custos)
+                          custo_gasolina_semana - st.session_state.despesas_fixas - outros_custos)
 
 margem_lucro = (ganhos_liquidos_semana / ganhos_brutos_semana) * 100 if ganhos_brutos_semana > 0 else 0
-
-# Cálculo do valor por hora
 valor_por_hora = ganhos_liquidos_semana / horas_trabalhadas_semana if horas_trabalhadas_semana > 0 else 0
 
-# Exibir resultados
+# Resultados
 st.header("Resultados Semanais")
-
 col1, col2, col3 = st.columns(3)
 col1.metric("Ganhos Líquidos Semanais", f"€{ganhos_liquidos_semana:.2f}")
 col2.metric("Comissão Plataforma", f"€{comissao_valor_semana:.2f}")
 col3.metric("Margem de Lucro", f"{margem_lucro:.1f}%")
 
-# Exibir resultado em €/h
 st.subheader("💰 Valor por Hora")
 st.metric("Ganho Líquido por Hora", f"€{valor_por_hora:.2f}")
 
-# Visualização simplificada
+# Distribuição de custos
 st.subheader("Distribuição dos Custos e Ganhos")
-
-# Criar visualização usando barras nativas do Streamlit
-categorias = ['Ganhos Líquidos', 'Comissão', 'Gasolina', 'Aluguer', 'Outros']
+categorias = ['Ganhos Líquidos', 'Comissão', 'Gasolina', 'Despesas Fixas', 'Outros']
 valores = [
     max(ganhos_liquidos_semana, 0), 
     comissao_valor_semana, 
     custo_gasolina_semana, 
-    st.session_state.aluguer_semanal, 
+    st.session_state.despesas_fixas, 
     outros_custos
 ]
 
@@ -141,19 +134,19 @@ with det_col1:
     st.write("**Custos:**")
     st.write(f"- Comissão Plataforma: €{comissao_valor_semana:.2f}")
     st.write(f"- Gasolina: €{custo_gasolina_semana:.2f}")
-    st.write(f"- Aluguer Viatura: €{st.session_state.aluguer_semanal:.2f}")
+    st.write(f"- Despesas Fixas (aluguer, seguro, slot, etc.): €{st.session_state.despesas_fixas:.2f}")
     st.write(f"- Outros Custos: €{outros_custos:.2f}")
 
 with det_col2:
+    total_custos = comissao_valor_semana + custo_gasolina_semana + st.session_state.despesas_fixas + outros_custos
     st.write("**Totais:**")
     st.write(f"- Total Ganhos: €{ganhos_brutos_semana:.2f}")
-    total_custos = comissao_valor_semana + custo_gasolina_semana + st.session_state.aluguer_semanal + outros_custos
     st.write(f"- Total Custos: €{total_custos:.2f}")
     st.write(f"- **Lucro Líquido: €{ganhos_liquidos_semana:.2f}**")
     st.write(f"- Margem de Lucro: {margem_lucro:.1f}%")
     st.write(f"- **Valor por Hora: €{valor_por_hora:.2f}**")
 
-# Cálculo diário
+# Cálculos diários
 st.subheader("💰 Médias Diárias")
 ganho_bruto_diario = ganhos_brutos_semana / dias_trabalhados
 ganho_liquido_diario = ganhos_liquidos_semana / dias_trabalhados
@@ -175,13 +168,12 @@ proj_col1.metric("Projeção de Ganhos Mensais", f"€{ganhos_mensais:.2f}")
 proj_col2.metric("Média Diária Líquida", f"€{ganho_liquido_diario:.2f}")
 proj_col3.metric("Valor por Hora", f"€{valor_por_hora:.2f}")
 
-# Resumo final
+# Resumo financeiro
 st.header("💶 Resumo Financeiro Semanal")
 resumo_col1, resumo_col2, resumo_col3 = st.columns(3)
 resumo_col1.metric("Apuro Semanal", f"€{ganhos_brutos_semana:.2f}")
 resumo_col2.metric("Custos Semanais", f"€{total_custos:.2f}")
-resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", 
-                  delta=f"{margem_lucro:.1f}%")
+resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", delta=f"{margem_lucro:.1f}%")
 
 # Resumo de horas
 st.subheader("⏰ Resumo de Horas")
@@ -190,10 +182,10 @@ horas_col1.metric("Total Horas Trabalhadas", f"{horas_trabalhadas_semana:.1f}h")
 horas_col2.metric("Média Horas por Dia", f"{horas_diarias:.1f}h")
 horas_col3.metric("Valor por Hora", f"€{valor_por_hora:.2f}")
 
-# Mostrar valores ocultos apenas em modo avançado
+# Valores avançados
 if st.session_state.show_advanced:
-    st.info(f"ℹ️ **Valores atuais das configurações avançadas:** Comissão: {st.session_state.comissao_plataforma}%, Aluguer: €{st.session_state.aluguer_semanal:.2f}")
+    st.info(f"ℹ️ **Valores atuais das configurações avançadas:** Comissão: {st.session_state.comissao_plataforma}%, Despesas Fixas: €{st.session_state.despesas_fixas:.2f}")
 
 # Rodapé
 st.markdown("---")
-st.caption("App desenvolvido para cálculo de ganhos no TVDE. Use o botão 'Configurações Avançadas' para ajustar a comissão e aluguer.")
+st.caption("App desenvolvido para cálculo de ganhos no TVDE. Use o botão 'Configurações Avançadas' para ajustar a comissão e despesas fixas.")
