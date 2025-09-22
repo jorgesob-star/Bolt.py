@@ -77,7 +77,7 @@ if st.session_state.show_advanced:
 st.header("Entradas Semanais")
 
 apuro_semanal = 855.0
-combustivel_semanal = 200.0
+combustivel_semanal = 100.0
 
 col1, col2 = st.columns(2)
 
@@ -108,7 +108,7 @@ with col2:
     outros_custos = st.number_input(
         "Outros Custos Semanais (€)", 
         min_value=0.0, 
-        value=0.0, 
+        value=100.0, 
         step=5.0,
         help="Lavagens, portagens, estacionamento, etc."
     )
