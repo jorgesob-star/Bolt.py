@@ -83,22 +83,36 @@ col1, col2 = st.columns(2)
 
 with col1:
     dias_trabalhados = st.slider("Dias trabalhados na semana", 1, 7, 7)
-    ganhos_brutos_semana = st.number_input(
-        "Ganhos Brutos Semanais (€)", 
+    ganhos_semanais = st.number_input(
+        "Ganhos Semanais (€)", 
         min_value=0.0, 
         value=apuro_semanal, 
         step=10.0,
-        help="Total de ganhos brutos na semana (apuro)"
+        help="Total de ganhos da semana (corridas TVDE, sem incluir extras)"
     )
-    horas_trabalhadas_semana = st.number_input(
-        "Total de horas trabalhadas na semana", 
+    gorjetas = st.number_input(
+        "Gorjetas (€)", 
         min_value=0.0, 
-        value=50.0, 
-        step=0.5,
-        help="Número total de horas que trabalhou durante a semana"
+        value=0.0, 
+        step=5.0,
+        help="Total de gorjetas recebidas na semana"
+    )
+    taxas_cancelamento = st.number_input(
+        "Taxas de Cancelamento (€)", 
+        min_value=0.0, 
+        value=0.0, 
+        step=5.0,
+        help="Taxas de cancelamento recebidas na semana"
     )
 
 with col2:
+    portagens_recebidas = st.number_input(
+        "Portagens Pagas (a receber) (€)", 
+        min_value=0.0, 
+        value=0.0, 
+        step=5.0,
+        help="Portagens pagas pelos clientes e reembolsadas pela plataforma"
+    )
     custo_gasolina_semana = st.number_input(
         "Custo com Gasolina Semanal (€)", 
         min_value=0.0, 
@@ -110,18 +124,29 @@ with col2:
         min_value=0.0, 
         value=100.0, 
         step=5.0,
-        help="Lavagens, portagens, estacionamento, etc."
+        help="Lavagens, estacionamento, etc."
     )
+
+horas_trabalhadas_semana = st.number_input(
+    "Total de horas trabalhadas na semana", 
+    min_value=0.0, 
+    value=50.0, 
+    step=0.5,
+    help="Número total de horas que trabalhou durante a semana"
+)
 
 # -------------------------------
 # Cálculos
 # -------------------------------
-comissao_valor_semana = ganhos_brutos_semana * (st.session_state.comissao_plataforma / 100)
+ganhos_extra = gorjetas + portagens_recebidas + taxas_cancelamento
+ganhos_totais = ganhos_semanais + ganhos_extra
 
-ganhos_liquidos_semana = (ganhos_brutos_semana - comissao_valor_semana - 
+comissao_valor_semana = ganhos_semanais * (st.session_state.comissao_plataforma / 100)
+
+ganhos_liquidos_semana = (ganhos_totais - comissao_valor_semana - 
                           custo_gasolina_semana - st.session_state.despesas_fixas - outros_custos)
 
-margem_lucro = (ganhos_liquidos_semana / ganhos_brutos_semana) * 100 if ganhos_brutos_semana > 0 else 0
+margem_lucro = (ganhos_liquidos_semana / ganhos_totais) * 100 if ganhos_totais > 0 else 0
 valor_por_hora = ganhos_liquidos_semana / horas_trabalhadas_semana if horas_trabalhadas_semana > 0 else 0
 
 # -------------------------------
@@ -165,7 +190,11 @@ det_col1, det_col2 = st.columns(2)
 
 with det_col1:
     st.write("**Ganhos:**")
-    st.write(f"- Apuro Bruto: €{ganhos_brutos_semana:.2f}")
+    st.write(f"- Ganhos Semanais: €{ganhos_semanais:.2f}")
+    st.write(f"- Gorjetas: €{gorjetas:.2f}")
+    st.write(f"- Portagens Recebidas: €{portagens_recebidas:.2f}")
+    st.write(f"- Taxas de Cancelamento: €{taxas_cancelamento:.2f}")
+    st.write(f"- **Total Ganhos: €{ganhos_totais:.2f}**")
     st.write("")
     st.write("**Custos Fixos Detalhados:**")
     for despesa, valor in st.session_state.despesas_fixas_detalhadas.items():
@@ -180,7 +209,7 @@ with det_col1:
 with det_col2:
     total_custos = comissao_valor_semana + custo_gasolina_semana + st.session_state.despesas_fixas + outros_custos
     st.write("**Totais:**")
-    st.write(f"- Total Ganhos: €{ganhos_brutos_semana:.2f}")
+    st.write(f"- Total Ganhos: €{ganhos_totais:.2f}")
     st.write(f"- Total Custos: €{total_custos:.2f}")
     st.write(f"- **Lucro Líquido: €{ganhos_liquidos_semana:.2f}**")
     st.write(f"- Margem de Lucro: {margem_lucro:.1f}%")
@@ -190,7 +219,7 @@ with det_col2:
 # Cálculos diários
 # -------------------------------
 st.subheader("💰 Médias Diárias")
-ganho_bruto_diario = ganhos_brutos_semana / dias_trabalhados
+ganho_bruto_diario = ganhos_totais / dias_trabalhados
 ganho_liquido_diario = ganhos_liquidos_semana / dias_trabalhados
 horas_diarias = horas_trabalhadas_semana / dias_trabalhados
 
@@ -217,7 +246,7 @@ proj_col3.metric("Valor por Hora", f"€{valor_por_hora:.2f}")
 # -------------------------------
 st.header("💶 Resumo Financeiro Semanal")
 resumo_col1, resumo_col2, resumo_col3 = st.columns(3)
-resumo_col1.metric("Apuro Semanal", f"€{ganhos_brutos_semana:.2f}")
+resumo_col1.metric("Ganhos + Extras", f"€{ganhos_totais:.2f}")
 resumo_col2.metric("Custos Semanais", f"€{total_custos:.2f}")
 resumo_col3.metric("Lucro Semanal", f"€{ganhos_liquidos_semana:.2f}", delta=f"{margem_lucro:.1f}%")
 
