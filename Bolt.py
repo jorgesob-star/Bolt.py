@@ -122,7 +122,7 @@ with col2:
     outros_custos = st.number_input(
         "Outros Custos Semanais (€)", 
         min_value=0.0, 
-        value=100.0, 
+        value=0.0, 
         step=5.0,
         help="Lavagens, estacionamento, etc."
     )
