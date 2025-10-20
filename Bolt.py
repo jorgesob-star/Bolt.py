@@ -19,15 +19,15 @@ st.markdown("Calcule seus rendimentos líquidos semanais como motorista TVDE")
 # Inicializar variáveis de sessão
 # -------------------------------
 if 'comissao_plataforma' not in st.session_state:
-    st.session_state.comissao_plataforma = 6.0
+    st.session_state.comissao_plataforma = 10.0
 
 # Despesas fixas detalhadas
 if 'despesas_fixas_detalhadas' not in st.session_state:
     st.session_state.despesas_fixas_detalhadas = {
-        "Aluguer": 270.0,
-        "Seguro": 0.0,
+        "Aluguer": 0.0,
+        "Seguro": 45.0,
         "Slot TVDE": 0.0,
-        "Manutenção": 0.0
+        "Manutenção": 50.0
     }
 
 # Total de despesas fixas
