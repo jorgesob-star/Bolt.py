@@ -77,7 +77,7 @@ if st.session_state.show_advanced:
 st.header("Entradas Semanais")
 
 apuro_semanal = 855.0
-combustivel_semanal = 100.0
+combustivel_semanal = 180.0
 
 col1, col2 = st.columns(2)
 
