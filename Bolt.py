@@ -130,7 +130,7 @@ with col2:
 horas_trabalhadas_semana = st.number_input(
     "Total de horas trabalhadas na semana", 
     min_value=0.0, 
-    value=50.0, 
+    value=45.0, 
     step=0.5,
     help="Número total de horas que trabalhou durante a semana"
 )
